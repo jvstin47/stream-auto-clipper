@@ -36,6 +36,15 @@ python stream_clipper.py --file input.mp4 --count 5
 - `clipper_config.py`: Configuration schema and loader.
 - `skills/stream-auto-clipper/`: Agent skill instructions.
 
+## Acknowledgements & Credits
+
+This project builds upon ideas and techniques explored in several open-source projects:
+
+- **[GTA-Auto-Clipper](https://github.com/AnIntellectualBeing/GTA-Auto-Clipper)** by AnIntellectualBeing: Live stream ingest pipelines and initial audio chunking architectures.
+- **[neonclipping](https://github.com/iamajmeena/neonclipping)** by iamajmeena: Stacked vertical video layout patterns and corner facecam detection techniques.
+- **[youtube-instagram-auto-uploader](https://github.com/Abhinavkumar-07/youtube-instagram-auto-uploader)** by Abhinavkumar-07: Reference patterns for cross-platform social media dispatch.
+- **[OpenCV Model Zoo](https://github.com/opencv/opencv_zoo)**: The lightweight YuNet ONNX face detection model.
+
 ## License
 
 MIT
