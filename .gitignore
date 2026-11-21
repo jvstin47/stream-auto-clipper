@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+env/
+venv/
+
+# Environment Variables
+.env
+.env.local
+
+# Video & Media Cache
+*.mp4
+*.ts
+*.mkv
+*.avi
+work/
+tmp/
+production/work/
+review/*.mp4
+output/
+
+# OS specific
+.DS_Store
+Thumbs.db

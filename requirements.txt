@@ -1,0 +1,7 @@
+numpy
+pillow
+opencv-python-headless>=4.10,<6
+requests
+python-dotenv
+yt-dlp
+faster-whisper

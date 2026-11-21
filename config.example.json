@@ -1,0 +1,13 @@
+{
+  "creator_name": "STREAMER",
+  "creator_handle": "streamer_live",
+  "game_title": "GAMING",
+  "platform": "KICK.COM",
+  "min_clip_duration": 30.0,
+  "max_clip_duration": 75.0,
+  "format_preference": "auto",
+  "bg_music_volume": 0.08,
+  "thumb_main_color": "#FFFFFF",
+  "thumb_accent_color": "#FFDD00",
+  "thumb_badge_color": "#E10A19"
+}
