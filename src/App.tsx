@@ -83,12 +83,60 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white font-body selection:bg-indigo-500/30 selection:text-white overflow-x-hidden">
-      {/* Ambient background glow */}
+    <div className="min-h-screen bg-black text-white font-body selection:bg-indigo-500/30 selection:text-white overflow-x-hidden relative">
+      {/* Background Dot Matrix & Grid Texture */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[680px] h-[360px] bg-indigo-600/10 blur-[130px] rounded-full" />
-        <div className="absolute top-[650px] -left-32 w-[420px] h-[420px] bg-purple-600/10 blur-[140px] rounded-full" />
-        <div className="absolute top-[1300px] -right-32 w-[520px] h-[520px] bg-blue-600/10 blur-[150px] rounded-full" />
+        {/* Subtle Dots with radial focus mask */}
+        <div className="absolute inset-0 bg-dot-pattern opacity-70 [mask-image:radial-gradient(ellipse_70%_50%_at_50%_35%,#000_25%,transparent_100%)]" />
+        {/* Faint Grid Lines */}
+        <div className="absolute inset-0 bg-grid-pattern opacity-35 [mask-image:radial-gradient(ellipse_80%_60%_at_50%_35%,#000_15%,transparent_100%)]" />
+
+        {/* Ambient Blurred Colored Glows */}
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[380px] bg-indigo-600/15 blur-[140px] rounded-full animate-pulse-slow" />
+        <div className="absolute top-[550px] -left-36 w-[480px] h-[480px] bg-purple-600/12 blur-[150px] rounded-full animate-drift" />
+        <div className="absolute top-[1200px] -right-36 w-[560px] h-[560px] bg-blue-600/12 blur-[160px] rounded-full animate-float-reverse" />
+
+        {/* Minimal Animated SVG Telemetry Nodes & Soundwave Lines */}
+        {/* Left Side: Floating Audio Frequency SVG */}
+        <svg
+          className="absolute top-48 left-6 sm:left-16 w-48 h-48 opacity-25 animate-drift pointer-events-none hidden md:block"
+          viewBox="0 0 200 200"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="100" cy="100" r="80" stroke="rgba(255,255,255,0.25)" strokeWidth="0.8" strokeDasharray="4 6" />
+          <circle cx="100" cy="100" r="50" stroke="rgba(99,102,241,0.4)" strokeWidth="1" strokeDasharray="3 4" />
+          <line x1="20" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,0.15)" strokeWidth="0.8" />
+          <line x1="100" y1="20" x2="100" y2="180" stroke="rgba(255,255,255,0.15)" strokeWidth="0.8" />
+          <circle cx="100" cy="100" r="3" fill="#6366f1" className="animate-ping" />
+          <circle cx="150" cy="100" r="2.5" fill="white" />
+          <circle cx="100" cy="50" r="2.5" fill="white" />
+          <circle cx="65" cy="135" r="2" fill="#ec4899" />
+          <path d="M 40 100 Q 70 65 100 100 T 160 100" stroke="rgba(99,102,241,0.5)" strokeWidth="1.2" fill="none" />
+        </svg>
+
+        {/* Right Side: Geometric Signal Radar SVG */}
+        <svg
+          className="absolute top-56 right-6 sm:right-16 w-56 h-56 opacity-25 animate-float-reverse pointer-events-none hidden md:block"
+          viewBox="0 0 220 220"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="110" cy="110" r="95" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8" strokeDasharray="6 8" />
+          <circle cx="110" cy="110" r="60" stroke="rgba(245,158,11,0.35)" strokeWidth="1" strokeDasharray="3 5" />
+          <polygon points="110,35 175,145 45,145" stroke="rgba(255,255,255,0.15)" strokeWidth="0.8" />
+          <circle cx="110" cy="35" r="2.5" fill="#f59e0b" />
+          <circle cx="175" cy="145" r="2.5" fill="white" />
+          <circle cx="45" cy="145" r="2.5" fill="white" />
+          <circle cx="110" cy="110" r="2" fill="#10b981" className="animate-ping" />
+          <line x1="30" y1="110" x2="190" y2="110" stroke="rgba(255,255,255,0.1)" strokeWidth="0.6" />
+        </svg>
+
+        {/* Ambient Top Subtle Grid Lines */}
+        <svg className="absolute top-0 inset-x-0 w-full h-80 opacity-20 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20%" y1="0" x2="20%" y2="100%" stroke="rgba(255,255,255,0.15)" strokeDasharray="2 4" strokeWidth="0.8" />
+          <line x1="80%" y1="0" x2="80%" y2="100%" stroke="rgba(255,255,255,0.15)" strokeDasharray="2 4" strokeWidth="0.8" />
+        </svg>
       </div>
 
       {/* Floating Navigation Pill */}
