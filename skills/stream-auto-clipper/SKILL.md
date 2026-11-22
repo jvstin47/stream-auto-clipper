@@ -122,27 +122,43 @@ The rendering engine automatically chooses the optimal layout:
 Generates a companion high-impact thumbnail for every clip:
 - **Color Grading**: $+25\%$ contrast, $+30\%$ color saturation, $+3\%$ brightness.
 - **Vignette**: Top and bottom dark gradient falloff for cinematic contrast.
-- **Esports Typography**:
-  - **Kanit Black 150pt** stacked text: Line 1 in pure white, Line 2 in electric gold (`#FFDD00`).
+- **Dynamic Category Badging**:
+  - `Wanted / Pursuit`: Siren Cyan (`#00F0FF`) + Siren Red (`#FF2A55`).
+  - `Combat / Heat`: Pure White (`#FFFFFF`) + Solar Gold (`#FFDD00`).
+  - `Stealth / Covert`: Pure White (`#FFFFFF`) + Toxic Emerald (`#00FF88`).
+  - `Speed / Stunt`: Pure White (`#FFFFFF`) + Hot Magenta (`#FF00A0`).
+  - `Heist / Clutch`: Pure White (`#FFFFFF`) + Solar Gold (`#FFDD00`).
+- **Esports Typography & Safe-Zone Chest Placement**:
+  - **Kanit Black 125pt–150pt** stacked text: Line 1 in category primary, Line 2 in electric accent.
   - 4-layer 3D drop shadow (`(0, 0, 0, 210)`) + 9px solid black outer stroke.
-  - Symmetrical angled polygon badge: `{GAME} • OFFICIAL HIGHLIGHT`.
-  - Bottom frosted callout pill with red live dot: `{PLATFORM} / {HANDLE}`.
+  - Symmetrical angled polygon badge at $Y = 115\text{ to }230$: `{CATEGORY} • OFFICIAL HIGHLIGHT`.
+  - Hook text placed at the lower chest safe zone ($Y \in [1380, 1560]$), leaving the top free for logos and bottom clear of UI.
+  - Bottom frosted callout pill with red live dot at $Y = 1830$: `{PLATFORM} / {HANDLE}`.
 - **1:1 Grid Safe Zones**:
   - All text is strictly bounded within $Y = 420\text{ to }1500$, ensuring zero text truncation when viewed in Instagram profile grids or YouTube Shorts shelves.
   - Mathematical bounding box centering:
     $$\Delta x = c_x - \frac{w}{2} - \text{bbox}_0, \quad \Delta y = c_y - \frac{h}{2} - \text{bbox}_1$$
 
-### Step 5: Multi-Platform Publishing (Zernio)
-Cross-post instantly or schedule to Instagram Reels and YouTube Shorts:
+### Step 5: Multi-Platform & Multi-Channel Dispatch (Zernio)
+Cross-post instantly or schedule to Instagram Reels and YouTube Shorts across multiple channel brands with strict deduplication:
 ```bash
 # Preview post payload (dry-run)
 python zernio_publish.py review/gta-clip-01.mp4 --now
 
-# Publish live to Instagram only
-python zernio_publish.py review/gta-clip-01.mp4 --now --publish --platform instagram
+# Publish live to primary channel (e.g. Phoenix)
+python zernio_publish.py review/gta-clip-01.mp4 --now --publish --account phoenix
 
-# Publish live to both Instagram and YouTube
-python zernio_publish.py review/gta-clip-01.mp4 --now --publish
+# Publish live to secondary channel (e.g. Carbon) with anti-collision checks
+python zernio_publish.py review/gta-clip-26.mp4 --now --publish --account carbon
+
+# Query live engagement telemetry & insights
+python zernio_publish.py review/gta-clip-20.mp4 --insights
+```
+
+### High-Converting Follow CTA Rule
+Instagram Reels truncate captions beyond 110 characters under the player overlay. Always structure captions with the active handle in the first line:
+```
+{Hook} 🔥 Follow @{handle} for daily {game} stunts & missions! 🚨 #{Tag1} #{Tag2} #Shorts #Reels
 ```
 
 ---

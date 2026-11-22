@@ -16,7 +16,11 @@ import {
   Code2,
   Volume2,
   ShieldCheck,
-  Target
+  Target,
+  BarChart2,
+  Layers,
+  Award,
+  Flame
 } from 'lucide-react';
 
 const VIDEO_SRC = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260511_080827_a9e5ad52-b6ee-4e79-b393-d936f179cfd7.mp4';
@@ -25,6 +29,7 @@ export default function App() {
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showSafeZone, setShowSafeZone] = useState(false);
+  const [activeAccountTab, setActiveAccountTab] = useState<'phoenix' | 'carbon'>('phoenix');
 
   const phoneRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -97,7 +102,6 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
         <div className="absolute top-[1200px] -right-36 w-[560px] h-[560px] bg-blue-600/12 blur-[160px] rounded-full animate-float-reverse" />
 
         {/* Minimal Animated SVG Telemetry Nodes & Soundwave Lines */}
-        {/* Left Side: Floating Audio Frequency SVG */}
         <svg
           className="absolute top-48 left-6 sm:left-16 w-48 h-48 opacity-25 animate-drift pointer-events-none hidden md:block"
           viewBox="0 0 200 200"
@@ -115,7 +119,6 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
           <path d="M 40 100 Q 70 65 100 100 T 160 100" stroke="rgba(99,102,241,0.5)" strokeWidth="1.2" fill="none" />
         </svg>
 
-        {/* Right Side: Geometric Signal Radar SVG */}
         <svg
           className="absolute top-56 right-6 sm:right-16 w-56 h-56 opacity-25 animate-float-reverse pointer-events-none hidden md:block"
           viewBox="0 0 220 220"
@@ -131,17 +134,11 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
           <circle cx="110" cy="110" r="2" fill="#10b981" className="animate-ping" />
           <line x1="30" y1="110" x2="190" y2="110" stroke="rgba(255,255,255,0.1)" strokeWidth="0.6" />
         </svg>
-
-        {/* Ambient Top Subtle Grid Lines */}
-        <svg className="absolute top-0 inset-x-0 w-full h-80 opacity-20 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-          <line x1="20%" y1="0" x2="20%" y2="100%" stroke="rgba(255,255,255,0.15)" strokeDasharray="2 4" strokeWidth="0.8" />
-          <line x1="80%" y1="0" x2="80%" y2="100%" stroke="rgba(255,255,255,0.15)" strokeDasharray="2 4" strokeWidth="0.8" />
-        </svg>
       </div>
 
       {/* Floating Navigation Pill */}
       <header className="sticky top-5 z-50 px-4 flex justify-center">
-        <nav className="liquid-glass flex items-center justify-between gap-6 rounded px-5 py-2.5 max-w-3xl w-full">
+        <nav className="liquid-glass flex items-center justify-between gap-6 rounded px-5 py-2.5 max-w-4xl w-full">
           <a href="#" className="flex items-center gap-2 group text-decoration-none">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="font-heading italic text-lg tracking-tight text-white group-hover:text-indigo-200 transition-colors">
@@ -149,15 +146,18 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
             </span>
           </a>
 
-          <div className="hidden sm:flex items-center gap-6">
+          <div className="hidden sm:flex items-center gap-5">
             <a href="#features" className="text-xs font-light text-white/70 hover:text-white transition-colors">
               Features
             </a>
+            <a href="#multichannel" className="text-xs font-light text-white/70 hover:text-white transition-colors">
+              Multi-Channel
+            </a>
+            <a href="#safezone" className="text-xs font-light text-white/70 hover:text-white transition-colors">
+              Safe-Zone Studio
+            </a>
             <a href="#quickstart" className="text-xs font-light text-white/70 hover:text-white transition-colors">
               Quickstart
-            </a>
-            <a href="#config" className="text-xs font-light text-white/70 hover:text-white transition-colors">
-              Config
             </a>
             <a href="#credits" className="text-xs font-light text-white/70 hover:text-white transition-colors">
               Credits
@@ -178,7 +178,7 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-16 pb-20 px-4 flex flex-col items-center text-center max-w-4xl mx-auto">
+      <section className="relative z-10 pt-16 pb-12 px-4 flex flex-col items-center text-center max-w-4xl mx-auto">
         <div
           className={`liquid-glass inline-flex items-center gap-2 px-3.5 py-1 rounded text-xs font-medium text-indigo-300 mb-6 transition-all duration-700 ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
@@ -198,12 +198,28 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
         </h1>
 
         <p
-          className={`text-sm sm:text-base text-white/70 max-w-xl font-light leading-relaxed mb-8 transition-all duration-1000 delay-150 ${
+          className={`text-sm sm:text-base text-white/70 max-w-xl font-light leading-relaxed mb-6 transition-all duration-1000 delay-150 ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
-          Turn raw gaming streams into high-energy vertical reels and esports cover thumbnails with automatic facecam tracking and 1:1 mobile safe zones.
+          Turn raw gaming streams into high-energy vertical reels and esports cover thumbnails with automatic facecam tracking, 1:1 mobile safe zones, and multi-channel dispatch.
         </p>
+
+        {/* Battle-Tested Metric Badge */}
+        <div
+          className={`flex flex-wrap items-center justify-center gap-2 mb-8 transition-all duration-1000 delay-200 ${
+            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          }`}
+        >
+          <div className="liquid-glass-strong px-3.5 py-1.5 rounded-full flex items-center gap-2 text-xs border border-emerald-500/30 text-emerald-300">
+            <Award size={13} className="text-emerald-400" />
+            <span className="font-medium">100,000+ Views Verified in Production</span>
+          </div>
+          <div className="liquid-glass px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs text-white/70">
+            <Flame size={12} className="text-amber-400" />
+            <span>27.5k Peak Reel Views &bull; 1.6x Loop Ratio</span>
+          </div>
+        </div>
 
         {/* Action Buttons */}
         <div
@@ -266,7 +282,6 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
             <div className="relative w-full h-full rounded-[28px] overflow-hidden bg-black flex flex-col">
               {/* Top 35%: Streamer Facecam Tracking Simulation */}
               <div className="relative h-[34%] w-full bg-zinc-900 overflow-hidden flex items-center justify-center border-b border-indigo-500/30">
-                {/* Background Facecam Video Feed */}
                 <video
                   ref={videoRef}
                   src={VIDEO_SRC}
@@ -319,7 +334,7 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
                 {showSafeZone && (
                   <div className="absolute inset-x-0 top-[18%] bottom-[18%] border-2 border-dashed border-amber-400/70 bg-amber-500/10 flex items-center justify-center pointer-events-none">
                     <span className="text-[9px] font-mono text-amber-300 bg-black/80 px-2 py-0.5 rounded uppercase tracking-wider">
-                      1:1 Profile Grid Safe Zone
+                      1:1 Profile Grid Safe Zone (Y: 420-1500)
                     </span>
                   </div>
                 )}
@@ -341,7 +356,6 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
                     <span>TWITCH.TV/SHROUD</span>
                   </div>
 
-                  {/* Audio EQ bars animation */}
                   <div className="flex items-end gap-0.5 h-3">
                     <span className="w-0.5 h-2 bg-indigo-400 animate-pulse" />
                     <span className="w-0.5 h-3 bg-indigo-400 animate-pulse delay-75" />
@@ -389,6 +403,28 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
         </div>
       </section>
 
+      {/* Production Telemetry Bar */}
+      <section className="relative z-10 py-8 px-4 max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="liquid-glass rounded-xl p-4 text-center">
+            <div className="text-2xl sm:text-3xl font-heading italic text-white mb-0.5">105,500+</div>
+            <div className="text-[11px] text-white/60 font-light">Verified Live Views</div>
+          </div>
+          <div className="liquid-glass rounded-xl p-4 text-center">
+            <div className="text-2xl sm:text-3xl font-heading italic text-indigo-300 mb-0.5">27.5k</div>
+            <div className="text-[11px] text-white/60 font-light">Peak Single Reel Views</div>
+          </div>
+          <div className="liquid-glass rounded-xl p-4 text-center">
+            <div className="text-2xl sm:text-3xl font-heading italic text-amber-300 mb-0.5">1.60x</div>
+            <div className="text-[11px] text-white/60 font-light">Views / Reach Loop Ratio</div>
+          </div>
+          <div className="liquid-glass rounded-xl p-4 text-center">
+            <div className="text-2xl sm:text-3xl font-heading italic text-emerald-300 mb-0.5">0.00s</div>
+            <div className="text-[11px] text-white/60 font-light">Frozen Start Latency</div>
+          </div>
+        </div>
+      </section>
+
       {/* Capabilities Section */}
       <section id="features" className="relative z-10 py-16 px-4 max-w-4xl mx-auto">
         <div className="text-center mb-10">
@@ -396,7 +432,7 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
             Engine Capabilities
           </h2>
           <p className="text-xs font-light text-white/60 max-w-md mx-auto">
-            Engineered for high-volume creator workflows and automated AI agent execution.
+            Engineered for high-volume creator workflows, multi-channel networks, and autonomous AI agents.
           </p>
         </div>
 
@@ -407,7 +443,7 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
             </div>
             <h3 className="text-sm font-medium text-white mb-1.5">Multimodal Peak Detection</h3>
             <p className="text-xs text-white/60 font-light leading-relaxed">
-              Calculates rolling 16-bit PCM decibel loudness peaks with OpenCV frame variance to detect peak action.
+              Calculates rolling 16-bit PCM decibel loudness peaks with OpenCV frame variance to detect genuine clutch action.
             </p>
           </div>
 
@@ -417,7 +453,7 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
             </div>
             <h3 className="text-sm font-medium text-white mb-1.5">Dynamic Durations (30s&ndash;75s)</h3>
             <p className="text-xs text-white/60 font-light leading-relaxed">
-              Preserves comedic timing and clutch conclusions by adapting duration to sustained audio energy.
+              Preserves punchlines and sustained chases by extending duration dynamically based on continuous audio decibels.
             </p>
           </div>
 
@@ -435,29 +471,190 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
             <div className="w-8 h-8 rounded-lg bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 mb-3">
               <Palette size={16} />
             </div>
-            <h3 className="text-sm font-medium text-white mb-1.5">Pro Gaming Thumbnails</h3>
+            <h3 className="text-sm font-medium text-white mb-1.5">1:1 Safe-Zone Thumbnail Studio</h3>
             <p className="text-xs text-white/60 font-light leading-relaxed">
-              Generates 150pt display typography, contrast-boosted covers, and strict 1:1 Instagram profile grid boundaries.
+              Mathematical subpixel font centering and lower chest anchoring ($Y \in [1380, 1560]$) prevent overlay collision.
             </p>
           </div>
 
           <div className="liquid-glass rounded-xl p-5">
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-3">
-              <Send size={16} />
+              <Layers size={16} />
             </div>
-            <h3 className="text-sm font-medium text-white mb-1.5">Cross-Platform Dispatch</h3>
+            <h3 className="text-sm font-medium text-white mb-1.5">Multi-Channel Anti-Collision</h3>
             <p className="text-xs text-white/60 font-light leading-relaxed">
-              Schedules and posts directly to Instagram Reels and YouTube Shorts via the Zernio social media API.
+              Dispatches clips to separate accounts with pre-flight deduplication blocking accidental cross-posting.
             </p>
           </div>
 
           <div className="liquid-glass rounded-xl p-5">
             <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-3">
+              <BarChart2 size={16} />
+            </div>
+            <h3 className="text-sm font-medium text-white mb-1.5">Live Telemetry & Insights</h3>
+            <p className="text-xs text-white/60 font-light leading-relaxed">
+              Built-in <code className="text-purple-300">--insights</code> CLI queries view counts and engagement without opening a browser.
+            </p>
+          </div>
+
+          <div className="liquid-glass rounded-xl p-5">
+            <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mb-3">
+              <Flame size={16} />
+            </div>
+            <h3 className="text-sm font-medium text-white mb-1.5">Dynamic Category Badging</h3>
+            <p className="text-xs text-white/60 font-light leading-relaxed">
+              Automatic keyword mapping to chromatic badge palettes (Wanted, Combat, Stealth, Speed, Heist).
+            </p>
+          </div>
+
+          <div className="liquid-glass rounded-xl p-5">
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-3">
+              <Send size={16} />
+            </div>
+            <h3 className="text-sm font-medium text-white mb-1.5">First-Line Follow CTAs</h3>
+            <p className="text-xs text-white/60 font-light leading-relaxed">
+              Under-110-character caption formatting keeps clickable profile handles above mobile Reels truncation fold.
+            </p>
+          </div>
+
+          <div className="liquid-glass rounded-xl p-5">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3">
               <Bot size={16} />
             </div>
             <h3 className="text-sm font-medium text-white mb-1.5">Autonomous Agent Skill</h3>
             <p className="text-xs text-white/60 font-light leading-relaxed">
-              Bundles standardized skill specifications so coding agents can execute clipping pipelines hands-free.
+              Standardized skill instructions allow AI coding agents to run capture, review, and publishing end-to-end.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Multi-Channel Architecture Showcase */}
+      <section id="multichannel" className="relative z-10 py-12 px-4 max-w-4xl mx-auto">
+        <div className="text-center mb-8">
+          <div className="liquid-glass inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium text-indigo-300 mb-3">
+            <Layers size={12} />
+            <span>Parallel Network Scaling</span>
+          </div>
+          <h2 className="font-heading italic text-2xl sm:text-3xl text-white mb-2">
+            Multi-Channel Anti-Collision Engine
+          </h2>
+          <p className="text-xs font-light text-white/60 max-w-lg mx-auto">
+            Scale your content output by 2x&ndash;5x across multiple brand accounts while enforcing 100% unique clip partitioning.
+          </p>
+        </div>
+
+        <div className="liquid-glass-strong rounded-2xl p-6 border border-white/10">
+          {/* Tab selector */}
+          <div className="flex items-center gap-2 mb-6 border-b border-white/10 pb-3">
+            <button
+              onClick={() => setActiveAccountTab('phoenix')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                activeAccountTab === 'phoenix'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                  : 'bg-white/5 text-white/60 hover:text-white'
+              }`}
+            >
+              Channel A (@phoenix.clippy)
+            </button>
+            <button
+              onClick={() => setActiveAccountTab('carbon')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                activeAccountTab === 'carbon'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                  : 'bg-white/5 text-white/60 hover:text-white'
+              }`}
+            >
+              Channel B (@carbon.clippy)
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <div>
+              <div className="text-xs font-mono text-indigo-400 mb-1">
+                {activeAccountTab === 'phoenix' ? 'ACTIVE PARTITION: CLIPS 01 - 25, 28' : 'ACTIVE PARTITION: CLIPS 26, 27, 29, 30+'}
+              </div>
+              <h3 className="text-lg font-heading italic text-white mb-2">
+                {activeAccountTab === 'phoenix' ? 'Phoenix Channel Strategy' : 'Carbon Channel Strategy'}
+              </h3>
+              <p className="text-xs text-white/70 font-light leading-relaxed mb-4">
+                {activeAccountTab === 'phoenix'
+                  ? 'Primary flagship channel focusing on extreme stunts and heavy combat clips. Shattered 100,000 views in 48 hours with 27.5k views on Underground Subway Shootout.'
+                  : 'Secondary high-frequency brand focusing on water pursuits, stealth infiltrations, and street races. Runs with dynamic @carbon.clippy handle swapping.'}
+              </p>
+
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center gap-2 text-emerald-400">
+                  <Check size={14} />
+                  <span>Strict zero-overlap guardrail: pre-flight checks block cross-channel duplication.</span>
+                </div>
+                <div className="flex items-center gap-2 text-emerald-400">
+                  <Check size={14} />
+                  <span>3-hour posting cadence prevents Instagram sibling reach cannibalization.</span>
+                </div>
+                <div className="flex items-center gap-2 text-emerald-400">
+                  <Check size={14} />
+                  <span>Dynamic caption routing: auto-swaps @handle for follower conversion.</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-zinc-950 rounded-xl p-4 border border-white/10 font-mono text-[11px] text-white/80 overflow-x-auto">
+              <div className="text-white/40 mb-2">// Multi-account dispatch command</div>
+              <div className="text-emerald-400 mb-1">
+                $ python zernio_publish.py clip.mp4 --now --publish --account {activeAccountTab}
+              </div>
+              <div className="text-white/60 mb-3">
+                &gt; Target: instagram ({activeAccountTab})<br />
+                &gt; Deduplication check: PASS (no previous post found)<br />
+                &gt; Caption routing: @{activeAccountTab}.clippy<br />
+                &gt; Accepted post ID: 6b0{activeAccountTab === 'phoenix' ? '097bebbc1076dc64a6e57' : '2dec7f2c3211763f73ea4'}
+              </div>
+              <div className="text-indigo-400">
+                $ python zernio_publish.py clip.mp4 --insights
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Safe-Zone Thumbnail Studio Deep Dive */}
+      <section id="safezone" className="relative z-10 py-12 px-4 max-w-4xl mx-auto">
+        <div className="text-center mb-8">
+          <div className="liquid-glass inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium text-amber-300 mb-3">
+            <Palette size={12} />
+            <span>Zero-Overlap Design</span>
+          </div>
+          <h2 className="font-heading italic text-2xl sm:text-3xl text-white mb-2">
+            1:1 Mobile Safe-Zone Formula
+          </h2>
+          <p className="text-xs font-light text-white/60 max-w-lg mx-auto">
+            Vertical thumbnails look great in 9:16 but get butchered on 1:1 Instagram profile grids unless anchored mathematically.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="liquid-glass rounded-xl p-5 border border-white/10">
+            <div className="text-xs font-mono text-cyan-400 mb-1">REGION 1: Y = 115 - 230</div>
+            <h4 className="text-sm font-medium text-white mb-1.5">Angled Category Badge</h4>
+            <p className="text-xs text-white/60 font-light leading-relaxed">
+              Positioned below top notch safe areas with dynamic chromatic palettes (Siren Cyan, Solar Gold, Toxic Emerald).
+            </p>
+          </div>
+
+          <div className="liquid-glass rounded-xl p-5 border border-amber-500/20 bg-amber-500/5">
+            <div className="text-xs font-mono text-amber-400 mb-1">REGION 2: Y = 1380 - 1560</div>
+            <h4 className="text-sm font-medium text-white mb-1.5">Chest Safe Zone Hook</h4>
+            <p className="text-xs text-white/60 font-light leading-relaxed">
+              Anchors bold 125pt typography below top game logos and safely above lower player captions. 100% visible in 1:1 grid crop!
+            </p>
+          </div>
+
+          <div className="liquid-glass rounded-xl p-5 border border-white/10">
+            <div className="text-xs font-mono text-pink-400 mb-1">REGION 3: Y = 1830</div>
+            <h4 className="text-sm font-medium text-white mb-1.5">Live Callout Pill</h4>
+            <p className="text-xs text-white/60 font-light leading-relaxed">
+              Frosted pill with glowing live indicator dot and creator handle, cleanly tucked at the bottom footer.
             </p>
           </div>
         </div>
@@ -513,10 +710,10 @@ python stream_clipper.py --file gameplay.mp4 --count 5`;
 
         <div className="liquid-glass rounded-xl p-5 border border-white/10 font-mono text-xs text-white/80 overflow-x-auto leading-relaxed">
           {`{
-  "creator_name": "SHROUD",
-  "creator_handle": "shroud",
-  "game_title": "VALORANT",
-  "platform": "TWITCH.TV",
+  "creator_name": "EAGLE GAMING",
+  "creator_handle": "eaglegaming",
+  "game_title": "GTA 6",
+  "platform": "KICK.COM",
   "min_clip_duration": 30.0,
   "max_clip_duration": 75.0,
   "format_preference": "auto",

@@ -1,5 +1,8 @@
 """Schedule one reviewed clip to YouTube and Instagram through Zernio.
 
+Supports single and multi-channel architectures with cross-account deduplication,
+dynamic caption routing, and analytics telemetry.
+
 Dry-run by default. Publishing requires --publish; posting unreviewed metadata
 also requires the explicit unattended configuration described in the README.
 """
@@ -73,7 +76,7 @@ def post_body(metadata, public_url, accounts, schedule, thumb_url=None):
     return body
 
 
-def upload_and_schedule(video_path, metadata_path, metadata, accounts, schedule, api_key):
+def upload_and_schedule(video_path, metadata_path, metadata, accounts, schedule, api_key, account_tag="default"):
     headers = {"Authorization": f"Bearer {api_key}"}
     with video_path.open("rb") as file:
         size = os.fstat(file.fileno()).st_size
@@ -109,7 +112,10 @@ def upload_and_schedule(video_path, metadata_path, metadata, accounts, schedule,
         except Exception as e:
             print(f"Warning: could not upload thumbnail ({e})")
 
-    idempotency_key = metadata.get("zernio_idempotency_key") or str(uuid.uuid4())
+    platform_suffix = "_".join(p for p, _ in accounts)
+    key_name = f"zernio_idempotency_key_{platform_suffix}" if len(accounts) == 1 else "zernio_idempotency_key"
+    idempotency_key = metadata.get(key_name) or str(uuid.uuid4())
+    metadata[key_name] = idempotency_key
     metadata["zernio_idempotency_key"] = idempotency_key
     with metadata_path.open("w", encoding="utf-8") as file:
         json.dump(metadata, file, ensure_ascii=False, indent=2)
@@ -123,11 +129,30 @@ def upload_and_schedule(video_path, metadata_path, metadata, accounts, schedule,
     if not post_id:
         raise RuntimeError("Zernio did not return a post ID; check the Zernio dashboard before retrying")
     metadata["zernio_post_id"] = post_id
+    metadata[f"zernio_{account_tag}_post_id"] = post_id
+    for platform, _ in accounts:
+        metadata[f"zernio_{platform}_post_id"] = post_id
     metadata["zernio_status"] = result.get("status", "accepted")
     metadata["scheduled_for"] = result.get("scheduledFor") or schedule
     with metadata_path.open("w", encoding="utf-8") as file:
         json.dump(metadata, file, ensure_ascii=False, indent=2)
     return result
+
+
+def fetch_insights(api_key, post_id):
+    """Fetch live analytics and engagement metrics from Zernio."""
+    headers = {"Authorization": f"Bearer {api_key}"}
+    try:
+        res = requests.get(f"{API}/posts/{post_id}/analytics", headers=headers, timeout=30)
+        if res.status_code == 200:
+            return res.json()
+        # Fallback to post details
+        p_res = requests.get(f"{API}/posts/{post_id}", headers=headers, timeout=30)
+        if p_res.status_code == 200:
+            return p_res.json()
+    except Exception as e:
+        print(f"Error fetching insights: {e}")
+    return None
 
 
 def main():
@@ -142,51 +167,96 @@ def main():
     parser.add_argument("--now", action="store_true", help="publish immediately instead of scheduling")
     parser.add_argument("--publish", action="store_true", help="send the post to Zernio; otherwise only preview")
     parser.add_argument("--platform", choices=["all", "instagram", "youtube"], default="all", help="target platform (default: all)")
+    parser.add_argument("--account", default="default", help="target account profile key (e.g. phoenix, carbon, primary)")
     parser.add_argument("--unattended", action="store_true", help="allow unreviewed metadata after one-time opt-in")
+    parser.add_argument("--insights", action="store_true", help="fetch live performance metrics for an already-published clip")
     args = parser.parse_args()
+
     base = args.clip.with_suffix("") if args.clip.suffix.lower() in {".mp4", ".json"} else args.clip
     video_path, metadata_path = base.with_suffix(".mp4"), base.with_suffix(".json")
     if not metadata_path.is_file():
         alt_meta = Path("production/metadata") / f"{base.name}.json"
         if alt_meta.is_file():
             metadata_path = alt_meta
-    if not video_path.is_file() or not metadata_path.is_file():
-        sys.exit("Clip files not found. Expected matching .mp4 and .json files.")
+
+    if not metadata_path.is_file():
+        sys.exit(f"Metadata file not found: {metadata_path}")
+
     try:
         metadata = load_metadata(metadata_path)
-        schedule = "now" if args.now else (scheduled_local_time(args.scheduled_for) if args.scheduled_for else None)
     except (OSError, ValueError, json.JSONDecodeError) as error:
         sys.exit(str(error))
+
+    api_key = os.environ.get("ZERNIO_API_KEY")
+
+    # Insights query mode
+    if args.insights:
+        if not api_key:
+            sys.exit("Set ZERNIO_API_KEY in your private environment to query insights.")
+        post_id = metadata.get("zernio_post_id") or metadata.get(f"zernio_{args.account}_post_id")
+        if not post_id:
+            sys.exit(f"Clip {base.name} has not been published yet (no post ID found).")
+        print(f"Fetching live telemetry for {base.name} (Post ID: {post_id})...")
+        insights = fetch_insights(api_key, post_id)
+        if insights:
+            print(json.dumps(insights, indent=2))
+        else:
+            print("No analytics data currently returned by API (may be pending Meta cache window).")
+        return
+
+    if not video_path.is_file():
+        sys.exit(f"Video file not found: {video_path}")
+
+    schedule = "now" if args.now else (scheduled_local_time(args.scheduled_for) if args.scheduled_for else None)
     if args.now and args.scheduled_for:
         sys.exit("Use either --now or --scheduled-for, not both.")
     if args.unattended and args.now:
         sys.exit("Unattended mode only schedules future posts; it cannot publish immediately.")
     if args.publish and not schedule:
         sys.exit("Choose --scheduled-for or --now before publishing.")
-    if metadata.get("zernio_post_id"):
-        sys.exit(f"This clip already has a Zernio post ID ({metadata['zernio_post_id']}); check its status before retrying.")
+
+    # Multi-account duplicate prevention & caption routing
+    account_key = args.account.lower()
+    ig_var = f"ZERNIO_INSTAGRAM_ACCOUNT_ID_{account_key.upper()}"
+    ig_account_id = os.environ.get(ig_var) or os.environ.get("ZERNIO_INSTAGRAM_ACCOUNT_ID")
+
+    # Anti-collision cross-account guardrails
+    if metadata.get(f"zernio_{account_key}_post_id"):
+        sys.exit(f"This clip already has a Zernio {account_key} post ID ({metadata[f'zernio_{account_key}_post_id']}); check status before retrying.")
+
+    for k, v in metadata.items():
+        if k.startswith("zernio_") and k.endswith("_post_id") and k != f"zernio_{account_key}_post_id" and k not in ("zernio_post_id", "zernio_instagram_post_id", "zernio_youtube_post_id"):
+            other_acc = k.replace("zernio_", "").replace("_post_id", "")
+            if other_acc != account_key:
+                sys.exit(f"DUPLICATE PREVENTION: This clip was already published to '{other_acc}' (ID: {v}). Each account must receive 100% unique clips!")
+
     if not metadata.get("approved") and not args.unattended:
         sys.exit("Clip metadata is not approved. Review it, or configure unattended posting and pass --unattended.")
     if args.unattended and os.environ.get("GTA_UNATTENDED_POSTS") != "1":
         sys.exit("Set GTA_UNATTENDED_POSTS=1 in your private environment to enable unattended publishing.")
-    accounts = [(platform, os.environ.get(variable, "")) for platform, variable in PLATFORMS]
-    accounts = [(platform, account) for platform, account in accounts if account]
-    if args.platform != "all":
-        accounts = [(platform, account) for platform, account in accounts if platform == args.platform]
+
+    accounts = []
+    if args.platform in ("all", "youtube"):
+        yt_id = os.environ.get("ZERNIO_YOUTUBE_ACCOUNT_ID", "")
+        if yt_id:
+            accounts.append(("youtube", yt_id))
+    if args.platform in ("all", "instagram"):
+        if ig_account_id:
+            accounts.append(("instagram", ig_account_id))
+
     if args.publish and not accounts:
-        sys.exit(f"Target platform account for '{args.platform}' is not configured in your environment.")
-    api_key = os.environ.get("ZERNIO_API_KEY")
+        sys.exit(f"Target platform account for '{args.platform}' ({account_key}) is not configured in your environment.")
     if args.publish and not api_key:
         sys.exit("Set ZERNIO_API_KEY in your private environment. Do not put it in a prompt or source file.")
 
-    destinations = ', '.join(p for p, _ in accounts) or 'YouTube + Instagram (account IDs not configured)'
+    destinations = f"{', '.join(p for p, _ in accounts)} ({account_key})"
     plan = f"{base.name}: {schedule or 'DRY RUN — no schedule sent'} -> {destinations}"
     print(plan)
     if not args.publish:
         print("No post sent. Add --publish to schedule or publish this clip.")
         return
     try:
-        post = upload_and_schedule(video_path, metadata_path, metadata, accounts, schedule, api_key)
+        post = upload_and_schedule(video_path, metadata_path, metadata, accounts, schedule, api_key, account_tag=account_key)
     except requests.HTTPError as error:
         status = error.response.status_code if error.response is not None else "unknown"
         sys.exit(f"Zernio returned HTTP {status}. Check the Zernio dashboard before retrying.")
