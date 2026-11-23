@@ -220,6 +220,12 @@ def main():
     ig_var = f"ZERNIO_INSTAGRAM_ACCOUNT_ID_{account_key.upper()}"
     ig_account_id = os.environ.get(ig_var) or os.environ.get("ZERNIO_INSTAGRAM_ACCOUNT_ID")
 
+    # Dynamic handle swapping in caption
+    if "instagram_caption" in metadata:
+        for known_handle in ("@phoenix.clippy", "@carbon.clippy", "@nitro.clippy"):
+            if known_handle in metadata["instagram_caption"]:
+                metadata["instagram_caption"] = metadata["instagram_caption"].replace(known_handle, f"@{account_key}.clippy")
+
     # Anti-collision cross-account guardrails
     if metadata.get(f"zernio_{account_key}_post_id"):
         sys.exit(f"This clip already has a Zernio {account_key} post ID ({metadata[f'zernio_{account_key}_post_id']}); check status before retrying.")
@@ -246,6 +252,9 @@ def main():
 
     if args.publish and not accounts:
         sys.exit(f"Target platform account for '{args.platform}' ({account_key}) is not configured in your environment.")
+
+    # Account-specific API key resolution
+    api_key = os.environ.get(f"ZERNIO_API_KEY_{account_key.upper()}") or os.environ.get("ZERNIO_API_KEY")
     if args.publish and not api_key:
         sys.exit("Set ZERNIO_API_KEY in your private environment. Do not put it in a prompt or source file.")
 
